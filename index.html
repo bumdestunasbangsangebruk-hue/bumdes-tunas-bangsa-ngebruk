@@ -1,575 +1,98 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUMDes TUNAS BANGSA NGEBRUK - Sistem Akuntansi & Manajemen</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS for Excel Export -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        bumdes: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white; color: black; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUMDes TUNAS BANGSA NGEBRUK - Sistem Manajemen & Akuntansi</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body>
 
-    <!-- GLOBAL APPS SCRIPT CONFIG MODAL -->
-    <div id="configApiModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
-            <h3 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <i data-lucide="settings" class="w-5 h-5 text-bumdes-600"></i> Pengaturan Backend API
-            </h3>
-            <p class="text-xs text-slate-500 mb-4">Masukkan Web App URL dari Google Apps Script untuk menghubungkan frontend ke basis data Google Sheets.</p>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-semibold text-slate-700 block mb-1">Google Apps Script Web App URL</label>
-                    <input type="url" id="gasApiUrlInput" placeholder="https://script.google.com/macros/s/AKfycbxXtC_He1XINc6etVwALfRZgMUvoPRjcN6XwVTahywbxUcaLg-euRUWAfPn_vuUHECnjQ/exec" class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-bumdes-500 outline-none">
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button onclick="closeConfigModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
-                    <button onclick="saveGasApiUrl()" class="px-4 py-2 text-xs font-medium bg-bumdes-600 text-white hover:bg-bumdes-700 rounded-lg shadow-sm">Simpan URL</button>
-                </div>
+  <!-- App Wrapper -->
+  <div id="app" class="d-flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-dark text-white p-3 vh-100 position-fixed">
+      <div class="sidebar-header border-bottom pb-3 mb-3">
+        <h5 class="fw-bold mb-0 text-success"><i class="bi bi-building"></i> BUMDes NGEBRUK</h5>
+        <small class="text-muted fs-7">Kab. Malang, Jawa Timur</small>
+      </div>
+      <ul class="nav nav-pills flex-column mb-auto" id="menu-list">
+        <li class="nav-item"><a href="#" class="nav-link active" onclick="switchMenu('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('pengeluaran')"><i class="bi bi-dash-circle text-danger"></i> Pengeluaran Kas/Bank</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('penerimaan')"><i class="bi bi-plus-circle text-success"></i> Penerimaan Kas/Bank</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('mutasi')"><i class="bi bi-arrow-left-right text-info"></i> Mutasi Internal</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('jurnal')"><i class="bi bi-journal-text text-warning"></i> Jurnal Umum Manual</a></li>
+        <hr>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('laba_rugi')"><i class="bi bi-file-earmark-bar-graph"></i> Laporan Laba Rugi</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('neraca')"><i class="bi bi-file-earmark-spreadsheet"></i> Neraca Posisi Keuangan</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('buku_besar')"><i class="bi bi-book"></i> Buku Besar</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('neraca_saldo')"><i class="bi bi-calculator"></i> Neraca Saldo</a></li>
+        <hr>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('coa')"><i class="bi bi-diagram-3"></i> Kode Rekening COA</a></li>
+        <li><a href="#" class="nav-link text-white" onclick="switchMenu('unit_usaha')"><i class="bi bi-shop"></i> Master Unit Usaha</a></li>
+      </ul>
+      <div class="user-profile border-top pt-3 mt-3 d-flex justify-content-between align-items-center">
+        <div>
+          <strong id="user-display-name">Direktur</strong><br>
+          <small id="user-display-role" class="badge bg-success">DIREKTUR</small>
+        </div>
+        <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-grow-1 p-4" style="margin-left: 260px;">
+      <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <div>
+          <h3 id="page-title" class="fw-bold mb-0">Dashboard Operasional</h3>
+          <small class="text-muted">Sistem Manajemen & Akuntansi Realtime BUMDes Tunas Bangsa Ngebruk</small>
+        </div>
+        <div id="filter-bar" class="d-flex gap-2">
+          <select id="filter-unit" class="form-select form-select-sm" onchange="refreshCurrentView()">
+            <option value="ALL">Semua Unit Usaha</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- Dynamic View Area -->
+      <div id="view-container"></div>
+    </main>
+  </div>
+
+  <!-- Modal Login -->
+  <div class="modal fade" id="loginModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-shield-lock"></i> Login System BUMDes</h5>
+        </div>
+        <div class="modal-body">
+          <form id="form-login" onsubmit="event.preventDefault(); handleLoginSubmit();">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Username</label>
+              <input type="text" id="login-username" class="form-control" required placeholder="Masukkan username">
             </div>
-        </div>
-    </div>
-
-    <!-- MAIN APP CONTAINER -->
-    <div id="app" class="flex-1 flex flex-col">
-        <!-- TOP NAVBAR -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center gap-3">
-                        <button onclick="toggleSidebar()" class="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden">
-                            <i data-lucide="menu" class="w-6 h-6"></i>
-                        </button>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-bumdes-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                                B
-                            </div>
-                            <div>
-                                <h1 class="font-bold text-sm text-slate-900 leading-tight">BUMDes TUNAS BANGSA NGEBRUK</h1>
-                                <p class="text-[10px] text-slate-500 font-medium">Desa Ngebruk, Kec. Poncokusumo, Kab. Malang</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <button onclick="openConfigModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100" title="Set URL API Apps Script">
-                            <i data-lucide="link" class="w-4 h-4"></i>
-                        </button>
-                        <div class="h-6 w-px bg-slate-200"></div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-bumdes-100 text-bumdes-700 font-bold text-xs flex items-center justify-center" id="userAvatar">
-                                DIR
-                            </div>
-                            <div class="hidden sm:block text-left">
-                                <p id="userNameDisplay" class="text-xs font-semibold text-slate-800">Direktur Utama</p>
-                                <span id="userRoleBadge" class="inline-block text-[9px] px-1.5 py-0.5 bg-bumdes-100 text-bumdes-800 font-semibold rounded">DIREKTUR</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Password</label>
+              <input type="password" id="login-password" class="form-control" required placeholder="Masukkan password">
             </div>
-        </header>
-
-        <!-- CONTENT BODY WITH SIDEBAR -->
-        <div class="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
-            <!-- SIDEBAR NAVIGATION -->
-            <aside id="sidebar" class="w-64 bg-white rounded-2xl border border-slate-200 p-4 shrink-0 hidden lg:block no-print space-y-6">
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Utama</p>
-                    <nav class="space-y-1">
-                        <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-dashboard">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-                        </button>
-                    </nav>
-                </div>
-
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Pencatatan Transaksi</p>
-                    <nav class="space-y-1">
-                        <button onclick="switchTab('receipts')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-receipts">
-                            <i data-lucide="arrow-down-left" class="w-4 h-4 text-emerald-600"></i> Penerimaan Kas/Bank
-                        </button>
-                        <button onclick="switchTab('expenses')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-expenses">
-                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-rose-600"></i> Pengeluaran Kas/Bank
-                        </button>
-                        <button onclick="switchTab('mutations')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-mutations">
-                            <i data-lucide="repeat" class="w-4 h-4 text-blue-600"></i> Mutasi Internal
-                        </button>
-                        <button onclick="switchTab('general-journal')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-general-journal">
-                            <i data-lucide="book-open" class="w-4 h-4 text-indigo-600"></i> Jurnal Umum Manual
-                        </button>
-                    </nav>
-                </div>
-
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Laporan Keuangan</p>
-                    <nav class="space-y-1">
-                        <button onclick="switchTab('ledger')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-ledger">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Buku Besar
-                        </button>
-                        <button onclick="switchTab('income-statement')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-income-statement">
-                            <i data-lucide="trending-up" class="w-4 h-4"></i> Laporan Laba Rugi
-                        </button>
-                        <button onclick="switchTab('balance-sheet')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-balance-sheet">
-                            <i data-lucide="scale" class="w-4 h-4"></i> Neraca Posisi Keuangan
-                        </button>
-                    </nav>
-                </div>
-
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Pengaturan & Master</p>
-                    <nav class="space-y-1">
-                        <button onclick="switchTab('coa')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-coa">
-                            <i data-lucide="list-tree" class="w-4 h-4"></i> Kode Rekening (COA)
-                        </button>
-                        <button onclick="switchTab('units')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-units">
-                            <i data-lucide="building-2" class="w-4 h-4"></i> Master Unit Usaha
-                        </button>
-                        <button onclick="switchTab('setup-wizard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-bumdes-600 transition" id="nav-setup-wizard">
-                            <i data-lucide="wand-2" class="w-4 h-4 text-purple-600"></i> Wizard Setup Awal
-                        </button>
-                    </nav>
-                </div>
-            </aside>
-
-            <!-- MAIN DYNAMIC CONTENT AREA -->
-            <main class="flex-1 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden">
-                
-                <!-- VIEW 1: DASHBOARD -->
-                <div id="view-dashboard" class="tab-content space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-900">Dashboard Kondisi Keuangan</h2>
-                            <p class="text-xs text-slate-500">Ringkasan kinerjadan arus kas BUMDes Tunas Bangsa Ngebruk</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <select id="dashUnitFilter" onchange="refreshDashboardData()" class="text-xs border rounded-xl px-3 py-2 bg-slate-50 font-medium">
-                                <option value="ALL">Semua Unit Usaha</option>
-                                <option value="UNT-001">Unit Perdagangan & Jasa</option>
-                                <option value="UNT-002">Unit Simpan Pinjam</option>
-                            </select>
-                            <button onclick="refreshDashboardData()" class="p-2 bg-bumdes-50 text-bumdes-700 rounded-xl hover:bg-bumdes-100">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- FINANCIAL STATS CARDS -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-semibold text-slate-500">Saldo Kas & Bank</span>
-                                <div class="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg"><i data-lucide="wallet" class="w-4 h-4"></i></div>
-                            </div>
-                            <p class="text-lg font-bold text-slate-900" id="dashTotalCash">Rp 0</p>
-                            <span class="text-[10px] text-emerald-600 font-medium">Likuiditas Siap Pakai</span>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-semibold text-slate-500">Total Pendapatan</span>
-                                <div class="p-1.5 bg-blue-100 text-blue-700 rounded-lg"><i data-lucide="arrow-down-right" class="w-4 h-4"></i></div>
-                            </div>
-                            <p class="text-lg font-bold text-slate-900" id="dashTotalRevenue">Rp 0</p>
-                            <span class="text-[10px] text-blue-600 font-medium">Akumulasi Periode Berjalan</span>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-semibold text-slate-500">Total Beban</span>
-                                <div class="p-1.5 bg-rose-100 text-rose-700 rounded-lg"><i data-lucide="arrow-up-right" class="w-4 h-4"></i></div>
-                            </div>
-                            <p class="text-lg font-bold text-slate-900" id="dashTotalExpense">Rp 0</p>
-                            <span class="text-[10px] text-rose-600 font-medium">Biaya Operasional</span>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-bumdes-50 border border-bumdes-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-semibold text-bumdes-800">Laba / Rugi Bersih</span>
-                                <div class="p-1.5 bg-bumdes-600 text-white rounded-lg"><i data-lucide="pie-chart" class="w-4 h-4"></i></div>
-                            </div>
-                            <p class="text-lg font-bold text-bumdes-900" id="dashNetIncome">Rp 0</p>
-                            <span class="text-[10px] text-bumdes-700 font-medium">Hasil Usaha Bersih</span>
-                        </div>
-                    </div>
-
-                    <!-- CHART AREA -->
-                    <div class="p-4 border rounded-2xl bg-slate-50/50">
-                        <h3 class="text-xs font-bold text-slate-700 mb-4">Tren Keuangan Bulan Berjalan</h3>
-                        <div class="h-64">
-                            <canvas id="financialChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 2: TRANSAKSI PENERIMAAN -->
-                <div id="view-receipts" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center pb-4 border-b">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-900">Transaksi Penerimaan Kas / Bank</h2>
-                            <p class="text-xs text-slate-500">Mencatat penerimaan uang masuk dan jurnal otomatis</p>
-                        </div>
-                        <button onclick="openReceiptModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-xl flex items-center gap-2 shadow-sm">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Catat Penerimaan
-                        </button>
-                    </div>
-
-                    <div class="overflow-x-auto border rounded-xl">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-50 border-b text-slate-600 uppercase font-semibold">
-                                <tr>
-                                    <th class="p-3">No. Dokumen</th>
-                                    <th class="p-3">Tanggal</th>
-                                    <th class="p-3">Sumber / Pelanggan</th>
-                                    <th class="p-3">Akun Kas/Bank (Debit)</th>
-                                    <th class="p-3">Akun Lawan (Kredit)</th>
-                                    <th class="p-3 text-right">Nominal</th>
-                                    <th class="p-3 text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="receiptsTableBody" class="divide-y text-slate-700">
-                                <tr>
-                                    <td colspan="7" class="p-4 text-center text-slate-400">Belum ada transaksi penerimaan.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- VIEW 3: BUKU BESAR -->
-                <div id="view-ledger" class="tab-content hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-900">Buku Besar (General Ledger)</h2>
-                            <p class="text-xs text-slate-500">Detail rincian mutasi debit/kredit per akun rekening</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <select id="ledgerAccountSelect" onchange="loadLedgerDetail()" class="text-xs border rounded-xl px-3 py-2 bg-slate-50 font-medium">
-                                <option value="1101">1101 - Kas Tunai Utama</option>
-                                <option value="1102">1102 - Bank Jatim / BRI</option>
-                                <option value="4101">4101 - Pendapatan Unit Usaha</option>
-                            </select>
-                            <button onclick="exportToExcel('Buku_Besar')" class="px-3 py-2 border rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-50">
-                                <i data-lucide="download" class="w-4 h-4"></i> Export
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto border rounded-xl">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-50 border-b text-slate-600 uppercase font-semibold">
-                                <tr>
-                                    <th class="p-3">Tanggal</th>
-                                    <th class="p-3">No. Jurnal</th>
-                                    <th class="p-3">Keterangan</th>
-                                    <th class="p-3 text-right">Debit</th>
-                                    <th class="p-3 text-right">Kredit</th>
-                                    <th class="p-3 text-right">Saldo Akhir</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ledgerTableBody" class="divide-y text-slate-700">
-                                <tr>
-                                    <td colspan="6" class="p-4 text-center text-slate-400">Pilih akun untuk melihat detail mutasi buku besar.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- VIEW 4: SETUP WIZARD -->
-                <div id="view-setup-wizard" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
-                    <div class="text-center space-y-2">
-                        <div class="w-12 h-12 bg-bumdes-100 text-bumdes-700 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                            <i data-lucide="wand-2" class="w-6 h-6"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-slate-900">Wizard Setup Awal BUMDes</h2>
-                        <p class="text-xs text-slate-500">Inisialisasi otomatis struktur tabel Google Sheets dan profil dasar</p>
-                    </div>
-
-                    <form id="wizardForm" onsubmit="executeSetupWizard(event)" class="space-y-4 border p-6 rounded-2xl bg-slate-50/50">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-700 block mb-1">Nama BUMDes</label>
-                            <input type="text" id="wizBumdesName" value="BUMDes Tunas Bangsa Ngebruk" required class="w-full text-xs p-3 border rounded-xl outline-none focus:ring-2 focus:ring-bumdes-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-semibold text-slate-700 block mb-1">Username Direktur</label>
-                                <input type="text" id="wizAdminUser" value="direktur" required class="w-full text-xs p-3 border rounded-xl outline-none focus:ring-2 focus:ring-bumdes-500">
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-slate-700 block mb-1">Password Direktur</label>
-                                <input type="password" id="wizAdminPass" value="admin123" required class="w-full text-xs p-3 border rounded-xl outline-none focus:ring-2 focus:ring-bumdes-500">
-                            </div>
-                        </div>
-                        <div class="pt-4">
-                            <button type="submit" class="w-full py-3 bg-bumdes-600 hover:bg-bumdes-700 text-white font-bold text-xs rounded-xl shadow-md transition">
-                                Jalankan Inisialisasi Database
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-            </main>
+            <button type="submit" class="btn btn-success w-100 fw-bold">Masuk ke Sistem</button>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- MODAL PENERIMAAN -->
-    <div id="receiptModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border">
-            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <i data-lucide="arrow-down-left" class="w-5 h-5 text-emerald-600"></i> Catat Penerimaan Kas/Bank
-            </h3>
-            <form onsubmit="saveReceiptTransaction(event)" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-700 block mb-1">Tanggal</label>
-                        <input type="date" id="rcvDate" required class="w-full text-xs p-2.5 border rounded-xl">
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-700 block mb-1">Unit Usaha</label>
-                        <select id="rcvUnit" class="w-full text-xs p-2.5 border rounded-xl">
-                            <option value="UNT-001">Unit Perdagangan & Jasa</option>
-                            <option value="UNT-002">Unit Simpan Pinjam</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-slate-700 block mb-1">Sumber / Pelanggan</label>
-                    <input type="text" id="rcvSource" placeholder="Contoh: Penjualan Produk Desa" required class="w-full text-xs p-2.5 border rounded-xl">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-700 block mb-1">Akun Kas/Bank (Debit)</label>
-                        <select id="rcvDebitAcc" class="w-full text-xs p-2.5 border rounded-xl">
-                            <option value="1101">1101 - Kas Tunai Utama</option>
-                            <option value="1102">1102 - Bank Jatim / BRI</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-700 block mb-1">Akun Lawan (Kredit)</label>
-                        <select id="rcvCreditAcc" class="w-full text-xs p-2.5 border rounded-xl">
-                            <option value="4101">4101 - Pendapatan Unit Usaha</option>
-                            <option value="4201">4201 - Pendapatan Lain-Lain</option>
-                            <option value="3101">3101 - Penyertaan Modal Desa</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-slate-700 block mb-1">Nominal (Rp)</label>
-                    <input type="number" id="rcvAmount" min="1" placeholder="1000000" required class="w-full text-xs p-2.5 border rounded-xl font-bold text-emerald-700">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-slate-700 block mb-1">Keterangan / Deskripsi</label>
-                    <textarea id="rcvDesc" rows="2" placeholder="Catatan transaksi..." class="w-full text-xs p-2.5 border rounded-xl"></textarea>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeReceiptModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm">Posting Transaction</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- CLIENT FRONTEND ENGINE SCRIPT -->
-    <script>
-        // State Store
-        let state = {
-            apiUrl: localStorage.getItem('BUMDES_GAS_API_URL') || '',
-            currentUser: { username: 'direktur', role: 'DIREKTUR', fullname: 'Direktur Utama' },
-            transactions: [],
-            accounts: [],
-            chartInstance: null
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            document.getElementById('rcvDate').valueAsDate = new Date();
-            initChart();
-            refreshDashboardData();
-        });
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('bg-slate-100', 'text-bumdes-600'));
-            
-            const targetView = document.getElementById(`view-${tabId}`);
-            if (targetView) targetView.classList.remove('hidden');
-            
-            const targetNav = document.getElementById(`nav-${tabId}`);
-            if (targetNav) targetNav.classList.add('bg-slate-100', 'text-bumdes-600');
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('financialChart').getContext('2d');
-            state.chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt'],
-                    datasets: [
-                        { label: 'Pendapatan (Rp)', data: [12000000, 15000000, 18000000, 14000000, 21000000, 25000000, 22000000, 28000000, 30000000, 35000000], backgroundColor: '#16a34a' },
-                        { label: 'Beban (Rp)', data: [8000000, 9000000, 10000000, 8500000, 12000000, 14000000, 13000000, 15000000, 16000000, 18000000], backgroundColor: '#e11d48' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        function openConfigModal() {
-            document.getElementById('gasApiUrlInput').value = state.apiUrl;
-            document.getElementById('configApiModal').classList.remove('hidden');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configApiModal').classList.add('hidden');
-        }
-
-        function saveGasApiUrl() {
-            const url = document.getElementById('gasApiUrlInput').value.trim();
-            localStorage.setItem('BUMDES_GAS_API_URL', url);
-            state.apiUrl = url;
-            closeConfigModal();
-            alert('URL Backend Apps Script berhasil disimpan!');
-        }
-
-        function openReceiptModal() { document.getElementById('receiptModal').classList.remove('hidden'); }
-        function closeReceiptModal() { document.getElementById('receiptModal').classList.add('hidden'); }
-
-        async function saveReceiptTransaction(e) {
-            e.preventDefault();
-            const payload = {
-                date: document.getElementById('rcvDate').value,
-                unit_id: document.getElementById('rcvUnit').value,
-                source: document.getElementById('rcvSource').value,
-                cash_bank_account: document.getElementById('rcvDebitAcc').value,
-                opposing_account: document.getElementById('rcvCreditAcc').value,
-                amount: parseFloat(document.getElementById('rcvAmount').value),
-                description: document.getElementById('rcvDesc').value,
-                type: 'PENERIMAAN_KAS',
-                payment_method: 'TUNAI'
-            };
-
-            if (state.apiUrl) {
-                try {
-                    const res = await fetch(state.apiUrl, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'POST_RECEIPT', payload: payload, user: state.currentUser })
-                    });
-                    const data = await res.json();
-                    alert(data.message);
-                } catch (err) {
-                    alert('Error connecting to GAS API: ' + err);
-                }
-            } else {
-                // Standalone Mode Fallback Simulation
-                state.transactions.push({
-                    docNo: 'TRM-202610-' + String(state.transactions.length + 1).padStart(4, '0'),
-                    ...payload
-                });
-                alert('Transaksi Penerimaan Berhasil Diposting (Local Mode)!');
-            }
-
-            closeReceiptModal();
-            renderReceiptsTable();
-            refreshDashboardData();
-        }
-
-        function renderReceiptsTable() {
-            const tbody = document.getElementById('receiptsTableBody');
-            if (state.transactions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada transaksi penerimaan.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = state.transactions.map(t => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-mono font-bold text-bumdes-700">${t.docNo}</td>
-                    <td class="p-3">${t.date}</td>
-                    <td class="p-3 font-medium">${t.source}</td>
-                    <td class="p-3">${t.cash_bank_account}</td>
-                    <td class="p-3">${t.opposing_account}</td>
-                    <td class="p-3 text-right font-bold text-emerald-600">Rp ${t.amount.toLocaleString('id-ID')}</td>
-                    <td class="p-3 text-center"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded-full text-[10px]">POSTED</span></td>
-                </tr>
-            `).join('');
-        }
-
-        function refreshDashboardData() {
-            let totalRev = 35000000;
-            let totalExp = 18000000;
-
-            state.transactions.forEach(t => {
-                totalRev += t.amount;
-            });
-
-            document.getElementById('dashTotalCash').innerText = `Rp ${(totalRev - totalExp + 50000000).toLocaleString('id-ID')}`;
-            document.getElementById('dashTotalRevenue').innerText = `Rp ${totalRev.toLocaleString('id-ID')}`;
-            document.getElementById('dashTotalExpense').innerText = `Rp ${totalExp.toLocaleString('id-ID')}`;
-            document.getElementById('dashNetIncome').innerText = `Rp ${(totalRev - totalExp).toLocaleString('id-ID')}`;
-        }
-
-        async function executeSetupWizard(e) {
-            e.preventDefault();
-            const payload = {
-                profile: { name: document.getElementById('wizBumdesName').value },
-                adminUsername: document.getElementById('wizAdminUser').value,
-                adminPassword: document.getElementById('wizAdminPass').value
-            };
-
-            if (!state.apiUrl) {
-                alert('Inisialisasi selesai (Simulasi Lokal)! Hubungkan Google Apps Script Web App URL untuk integrasi Google Spreadsheet live.');
-                return;
-            }
-
-            try {
-                const res = await fetch(state.apiUrl, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'SETUP_INITIAL_DATABASE', payload: payload })
-                });
-                const data = await res.json();
-                alert(data.message);
-            } catch (err) {
-                alert('Gagal mengeksekusi Setup Wizard: ' + err);
-            }
-        }
-
-        function exportToExcel(filename) {
-            const table = document.querySelector('table');
-            const wb = XLSX.utils.table_to_book(table);
-            XLSX.writeFile(wb, `${filename}_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-    </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/transaksi.js"></script>
+  <script src="js/jurnal.js"></script>
+  <script src="js/laporan.js"></script>
+  <script src="js/master.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
